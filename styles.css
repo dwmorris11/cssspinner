@@ -76,6 +76,9 @@
     position: absolute;
     inset: 0;
     border-radius: 50%;
+    border-style: solid;
+    border-width: 2px;
+    border-color: black;
     background: conic-gradient(var(--slice-random-color, green) 0deg var(--section-size), transparent var(--section-size) 360deg);
     transform: rotate(calc(var(--i) * var(--section-size)));
   }

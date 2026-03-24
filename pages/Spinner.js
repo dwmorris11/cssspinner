@@ -1,9 +1,10 @@
-import { Spinner } from "../components/Spinner/index.js";
 import Page from "./Page.js";
+// import custom components so they are available
+import "../components/Spinner/index.js";
 
 export default class SpinnerPage extends Page {
   #children = () => `
-          <form id="ui-form">
+    <form id="ui-form">
       <input
         id="numslices_input"
         class="ui-input"
@@ -14,7 +15,7 @@ export default class SpinnerPage extends Page {
         <span>Spin</span>
       </button>
     </form>
-    <spinner-element sliceCount="8"></spinner-element>
+    <spinner-element slicecount="8"></spinner-element>
   `;
   constructor() {
     super("spinnerPage");
@@ -25,6 +26,14 @@ export default class SpinnerPage extends Page {
     const tpl = document.createElement("template");
     tpl.innerHTML = this.#children();
     const content = tpl.content.cloneNode(true);
+    const spinnerElement = content.querySelector("spinner-element");
+    const input = content.querySelector("input");
+    input.addEventListener("change", (event) => {
+      const value = Number(event.target.value);
+      if (Number.isFinite(value)) {
+        spinnerElement.setAttribute("sliceCount", value.toString());
+      }
+    });
     super.appendChild(content);
   }
 }

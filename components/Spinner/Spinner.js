@@ -1,6 +1,8 @@
 import Slice from "./Slice.js";
 
 export default class Spinner extends HTMLElement {
+  static observedAttributes = ["slicecount"];
+
   #template = (sliceCount) =>
     `<div class="spinner" style="--slice-count: ${sliceCount}"></div>`;
 
@@ -10,6 +12,17 @@ export default class Spinner extends HTMLElement {
   }
 
   connectedCallback() {
+    this.#render();
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (name === "slicecount" && oldValue !== null) {
+      this.#render();
+    }
+  }
+
+  #render() {
+    this.innerHTML = "";
     const sliceCount = this.getAttribute("sliceCount") || this.sliceCount || 8;
     const tpl = document.createElement("template");
     tpl.innerHTML = this.#template(sliceCount);
@@ -27,7 +40,6 @@ export default class Spinner extends HTMLElement {
 
       spinnerDiv.appendChild(new Slice(i, randomColor));
     }
-
     this.appendChild(content);
   }
 }
