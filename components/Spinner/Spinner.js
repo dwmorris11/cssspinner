@@ -122,7 +122,6 @@ export default class Spinner extends HTMLElement {
       const fontSize = calculateFontSize(labelText, sliceCount);
       text.setAttribute("font-size", fontSize);
       text.style.fontSize = `${fontSize}px`;
-      console.log(fontSize);
       textPath.textContent = labelText;
 
       text.appendChild(textPath);
