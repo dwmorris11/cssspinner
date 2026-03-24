@@ -73,28 +73,236 @@
 }
 
 @layer components {
-  slice-element {
-    display: contents;
-  }
+  @layer spinner-page {
+    spinner-page {
+      /* change the element from inline(default) to flex to use overflow hidden.
+       Hides the overflow bar while it spins */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      padding: 2rem;
+      overflow: hidden;
+      --spinner-size: min(50rem, 80vw);
+    }
 
-  .spinner {
-    position: relative;
-    width: min(200px, 80vw);
-    aspect-ratio: 1;
-  }
+    #ui-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+      max-width: 400px;
+    }
 
-  .slice {
-    --section-size: calc(360deg / var(--slice-count, 4));
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    border-style: solid;
-    border-width: 2px;
-    border-color: black;
-    background: conic-gradient(
-      var(--slice-random-color, green) 0deg var(--section-size),
-      transparent var(--section-size) 360deg
-    );
-    transform: rotate(calc(var(--i) * var(--section-size)));
+    .spinning-wheel {
+      position: relative;
+      margin: auto;
+      width: fit-content;
+      height: fit-content;
+    }
+
+    textarea.ui-input {
+      width: 100%;
+      min-width: 250px;
+      resize: vertical;
+      font-family: inherit;
+      padding: 0.75rem 1rem;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+
+      &:focus {
+        outline: none;
+        border-color: #4a90d9;
+        box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.25);
+      }
+    }
+
+    .ui-button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      background: #4a90d9;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition:
+        transform 0.1s,
+        box-shadow 0.1s,
+        background 0.2s;
+
+      &:hover {
+        background: #3a7bc8;
+        transform: scale(1.02);
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+    }
+    .wedges,
+    .labels {
+      position: absolute;
+      inset: 0;
+    }
+
+    .labels {
+      z-index: 1;
+    }
+
+    .slice-wedge {
+      --section-size: calc(360deg / var(--slice-count, 4));
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid black;
+      background: conic-gradient(
+        var(--slice-random-color, green) 0deg var(--section-size),
+        transparent var(--section-size) 360deg
+      );
+      rotate: calc(var(--i) * var(--section-size));
+    }
+
+    .slice-label {
+      --section-size: calc(360deg / var(--slice-count, 4));
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      rotate: calc(
+        var(--i) * var(--section-size) + var(--section-size) / 2 + 90deg
+      );
+      transform: translateY(calc(var(--spinner-size) * -0.35));
+      font-size: 1rem;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    .slice-label-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none;
+
+      text {
+        font-size: 5px; /* Relative to viewBox */
+        font-weight: bold;
+        text-anchor: middle;
+        dominant-baseline: middle;
+        pointer-events: auto;
+        cursor: pointer;
+      }
+    }
+
+    .label-tooltip {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.95);
+      color: black;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+
+      &[hidden] {
+        display: none;
+      }
+    }
+    .spinner {
+      position: relative;
+      width: var(--spinner-size);
+      aspect-ratio: 1;
+      overflow: visible;
+      filter: drop-shadow(
+        0 8px 32px rgba(0, 0, 0, 0.3)
+      ); // drop shadow respects the rendered shape
+    }
+
+    .spinner.spinning {
+      animation: spin 3s cubic-bezier(0.17, 0.67, 0.12, 0.99) forwards;
+    }
+    /* Using keyframes to reset the animation on every
+  button push vs. transistion which remembers the rotation */
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(calc(360deg * 5 + var(--final-rotation, 137deg)));
+      }
+    }
+
+    .slice {
+      --section-size: calc(360deg / var(--slice-count, 4));
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border-style: solid;
+      border-width: 2px;
+      border-color: black;
+      overflow: visible;
+      background: conic-gradient(
+        var(--slice-random-color, green) 0deg var(--section-size),
+        transparent var(--section-size) 360deg
+      );
+      rotate: calc(var(--i) * var(--section-size));
+    }
+
+    .slice span {
+      position: absolute;
+      z-index: 10;
+      top: 50%;
+      left: 50%;
+      /* 1. Rotate to middle of the wedge */
+      /* 2. Move outward from center */
+      rotate: calc(var(--section-size) / 2 + 90deg);
+      transform: translateY(-1050%);
+      font-size: 1rem;
+      font-weight: bold;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    // adds the black border around the clipped indicator
+    .indicator-wrapper {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      filter: drop-shadow(1px 1px 0 black) drop-shadow(-1px 1px 0 black)
+        drop-shadow(0 -1px 0 black);
+    }
+
+    .indicator {
+      width: 25px;
+      height: 50px;
+      background-color: gold;
+      clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
+    }
+
+    .pin {
+      position: absolute;
+      // move the pin to the middle of the spinner
+      top: calc(var(--spinner-size) / 2);
+      // left 50 moves it to the center of the page
+      // while transform adjusts for the size of the pin
+      left: 50%;
+      transform: translateX(-50%) translateY(-50%);
+
+      border-radius: 100%;
+      border-color: black;
+      background: radial-gradient(circle at 30% 30%, #555, #000);
+      width: 50px;
+      height: 50px;
+    }
   }
 }
