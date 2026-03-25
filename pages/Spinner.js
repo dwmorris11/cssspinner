@@ -23,7 +23,7 @@ export default class SpinnerPage extends Page {
       <div class="indicator-wrapper">
         <div class="indicator"></div>
       </div>
-      <spinner-element slicecount="8"></spinner-element>
+      <spinner-element slicecount="8" labelmode="radial"></spinner-element>
     </div>
   `;
   constructor() {

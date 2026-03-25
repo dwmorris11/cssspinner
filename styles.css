@@ -81,6 +81,12 @@
       gap: 1rem;
       width: 100%;
       max-width: 400px;
+      position: relative;
+      z-index: 1;
+    }
+    .preload-options {
+      position: relative;
+      z-index: 2;
     }
     .spinning-wheel {
       position: relative;
@@ -127,6 +133,7 @@
     }
     .labels {
       z-index: 1;
+      pointer-events: none;
     }
     .slice-wedge {
       --section-size: calc(360deg / var(--slice-count, 4));

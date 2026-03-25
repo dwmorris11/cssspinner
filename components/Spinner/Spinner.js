@@ -21,6 +21,7 @@
  *
  * @attribute {number} slicecount - Number of wedges to display (default: 8)
  * @attribute {string} labels - JSON array of label strings for each wedge (default: empty array)
+ * @attribute {string} labelmode - "curved" (default) for arc text, "radial" for 90° rotated text pointing outward
  *
  * @fires mouseenter - Triggered when hovering over a label, displays tooltip
  * @fires mouseleave - Triggered when leaving a label, hides tooltip
@@ -37,7 +38,7 @@
  */
 import { COLOR_PALETTE } from "../../pages/data/Spinner/constants.js";
 export default class Spinner extends HTMLElement {
-  static observedAttributes = ["slicecount", "labels"];
+  static observedAttributes = ["slicecount", "labels", "labelmode"];
 
   #template = (sliceCount) =>
     `<div class="spinner-wrapper">
@@ -94,43 +95,70 @@ export default class Spinner extends HTMLElement {
       wedge.style.cssText = `--i: ${i}; --slice-random-color: ${sliceColor}`;
       wedgesDiv.appendChild(wedge);
 
-      // Curved label using SVG
+      // Label using SVG
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.setAttribute("viewBox", "0 0 100 100");
       svg.classList.add("slice-label-svg");
       svg.style.cssText = `--i: ${i}`;
 
-      // Arc path - adjust radius (35) for text position
-      const pathId = `arc-${i}`;
-      const startAngle = (i - 1) * sectionSize + sectionSize * 0.15; // offset from edge
-      const endAngle = i * sectionSize - sectionSize * 0.15;
-      const path = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "path",
-      );
-      path.setAttribute("id", pathId);
-      path.setAttribute("d", describeArc(50, 50, 35, startAngle, endAngle));
-      path.setAttribute("fill", "none");
-
-      const text = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "text",
-      );
-      const textPath = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "textPath",
-      );
-      textPath.setAttribute("href", `#${pathId}`);
-      textPath.setAttribute("startOffset", "50%");
       const labelText = labels[i - 1] || "";
-      const fontSize = calculateFontSize(labelText, sliceCount);
-      text.setAttribute("font-size", fontSize);
-      text.style.fontSize = `${fontSize}px`;
-      textPath.textContent = labelText;
+      const labelMode = this.getAttribute("labelmode") || "curved";
 
-      text.appendChild(textPath);
-      svg.appendChild(path);
-      svg.appendChild(text);
+      if (labelMode === "radial") {
+        // Radial mode: text rotated 90° pointing outward
+        const midAngle = (i - 0.5) * sectionSize;
+        const radius = 30;
+        const angleRad = ((midAngle - 90) * Math.PI) / 180;
+        const x = 50 + radius * Math.cos(angleRad);
+        const y = 50 + radius * Math.sin(angleRad);
+
+        const text = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "text",
+        );
+        text.setAttribute("x", x);
+        text.setAttribute("y", y);
+        text.setAttribute("transform", `rotate(${midAngle - 90}, ${x}, ${y})`);
+        text.setAttribute("text-anchor", "middle");
+        text.setAttribute("dominant-baseline", "middle");
+        const fontSize = calculateRadialFontSize(labelText, sliceCount);
+        text.setAttribute("font-size", fontSize);
+        text.style.fontSize = `${fontSize}px`;
+        text.textContent = labelText;
+        svg.appendChild(text);
+      } else {
+        // Curved mode: text along arc path (default)
+        const pathId = `arc-${i}`;
+        const startAngle = (i - 1) * sectionSize + sectionSize * 0.15;
+        const endAngle = i * sectionSize - sectionSize * 0.15;
+        const path = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "path",
+        );
+        path.setAttribute("id", pathId);
+        path.setAttribute("d", describeArc(50, 50, 35, startAngle, endAngle));
+        path.setAttribute("fill", "none");
+
+        const text = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "text",
+        );
+        const textPath = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "textPath",
+        );
+        textPath.setAttribute("href", `#${pathId}`);
+        textPath.setAttribute("startOffset", "50%");
+        const fontSize = calculateFontSize(labelText, sliceCount);
+        text.setAttribute("font-size", fontSize);
+        text.style.fontSize = `${fontSize}px`;
+        textPath.textContent = labelText;
+
+        text.appendChild(textPath);
+        svg.appendChild(path);
+        svg.appendChild(text);
+      }
+
       labelsDiv.appendChild(svg);
       // Add hover events to show tooltip
       svg.addEventListener("mouseenter", () => {
@@ -170,6 +198,19 @@ function calculateFontSize(text, sliceCount, radius = 35) {
   const estimatedTextWidth = text.length * 0.5; // rough estimate per char
   const idealSize = arcLength / estimatedTextWidth;
   return Math.max(2, Math.min(6, idealSize)); // clamp 2-6
+}
+
+function calculateRadialFontSize(text, sliceCount) {
+  // Radial text has more room along the radius but limited by slice width
+  const maxRadius = 35; // available radial space
+  const charWidth = 0.55;
+  const textWidth = text.length * charWidth;
+  const radiusBasedSize = maxRadius / textWidth;
+  // Also consider slice angle for height constraint
+  const sliceAngle = 360 / sliceCount;
+  const angleBasedSize = sliceAngle * 0.15;
+  const idealSize = Math.min(radiusBasedSize, angleBasedSize);
+  return Math.max(2, Math.min(5, idealSize)); // clamp 2-5
 }
 
 customElements.define("spinner-element", Spinner);
