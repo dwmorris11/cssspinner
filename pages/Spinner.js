@@ -29,6 +29,20 @@ export default class SpinnerPage extends Page {
       <spinner-element slicecount="8" labelmode="radial"></spinner-element>
     </div>
     <div id="spin-result" role="status" aria-live="polite" class="visually-hidden"></div>
+    <about-section title="About the Spinner">
+      <p>This page demonstrates a <strong>CSS-powered spinning wheel</strong> built entirely with Vanilla JS and CSS.</p>
+      <p>The only package used was esbuild to minify the javascript. <a href="https://github.com/dwmorris11/cssspinner" target="_blank">View source</a></p>
+      <p><strong>Features showcased:</strong></p>
+      <ul>
+        <li>CSS conic-gradient for pie slice rendering</li>
+        <li>CSS keyframe animations with cubic-bezier easing</li>
+        <li>SVG text paths for curved/radial labels</li>
+        <li>Web Components (Custom Elements)</li>
+        <li>Responsive design with CSS custom properties</li>
+        <li>Accessibility: reduced motion support, ARIA labels</li>
+      </ul>
+      <p>Enter names separated by commas or newlines, then click Spin to randomly select a winner.</p>
+    </about-section>
   `;
   constructor() {
     super("spinnerPage");
@@ -106,9 +120,14 @@ export default class SpinnerPage extends Page {
       spinner.classList.add("spinning");
 
       // Announce result after spin animation (3s, or 0.5s with reduced motion)
-      const duration = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 500 : 3000;
+      const duration = window.matchMedia("(prefers-reduced-motion: reduce)")
+        .matches
+        ? 500
+        : 3000;
       setTimeout(() => {
-        const finalRotation = parseFloat(spinner.style.getPropertyValue("--final-rotation"));
+        const finalRotation = parseFloat(
+          spinner.style.getPropertyValue("--final-rotation"),
+        );
         const sliceAngle = 360 / labels.length;
         // Calculate which slice the indicator points to (top = 0 degrees)
         const normalizedAngle = (360 - (finalRotation % 360)) % 360;
