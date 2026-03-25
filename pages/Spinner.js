@@ -9,7 +9,7 @@ export default class SpinnerPage extends Page {
       selects: [{ id: "cuisines", label: "Cuisines", options: CUISINES }],
     })}
     <form id="ui-form" aria-label="Spinning wheel configuration">
-      <label for="wedges_input" class="visually-hidden">Wheel options (comma or line separated)</label>
+      <label for="wedges_input">Wheel options (comma or line separated)</label>
       <textarea
         id="wedges_input"
         class="ui-input"

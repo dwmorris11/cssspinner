@@ -130,6 +130,12 @@
       width: fit-content;
       height: fit-content;
     }
+    #ui-form label {
+      color: #ff8c00;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
     textarea.ui-input {
       width: 100%;
       min-width: 250px;
