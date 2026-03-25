@@ -1,37 +1,41 @@
-// Curated color palette - 30 vibrant and distinct colors
-const COLOR_PALETTE = [
-  "#FF6B6B", // coral red
-  "#4ECDC4", // teal
-  "#FFE66D", // sunny yellow
-  "#95E1D3", // mint
-  "#F38181", // salmon
-  "#AA96DA", // lavender
-  "#FCBAD3", // pink
-  "#A8D8EA", // sky blue
-  "#FF9F43", // orange
-  "#6BCB77", // green
-  "#845EC2", // purple
-  "#FF6F91", // hot pink
-  "#FFC75F", // golden yellow
-  "#00C9A7", // emerald
-  "#C34A36", // rust
-  "#008B74", // deep teal
-  "#B39CD0", // soft purple
-  "#FF8066", // coral orange
-  "#00D2FC", // cyan
-  "#D5CABD", // warm gray
-  "#4D8076", // forest
-  "#F9F871", // lemon
-  "#FF5E78", // watermelon
-  "#2C73D2", // royal blue
-  "#D65DB1", // magenta
-  "#0089BA", // ocean blue
-  "#EE9B00", // amber
-  "#9B5DE5", // violet
-  "#00BBF9", // bright blue
-  "#00F5D4", // aqua
-];
-
+/**
+ * Spinner - A Web Component for creating interactive spinning wheels
+ *
+ * A custom HTML element that renders a circular spinner/wheel with customizable wedges and labels.
+ * Each wedge is colored from a curated color palette, and labels can be displayed along curved paths.
+ *
+ * @class Spinner
+ * @extends HTMLElement
+ *
+ * @example
+ * // Basic usage with default 8 slices
+ * <spinner-element></spinner-element>
+ *
+ * @example
+ * // Custom slice count
+ * <spinner-element slicecount="12"></spinner-element>
+ *
+ * @example
+ * // With labels
+ * <spinner-element slicecount="6" labels='["Red", "Blue", "Green", "Yellow", "Purple", "Orange"]'></spinner-element>
+ *
+ * @attribute {number} slicecount - Number of wedges to display (default: 8)
+ * @attribute {string} labels - JSON array of label strings for each wedge (default: empty array)
+ *
+ * @fires mouseenter - Triggered when hovering over a label, displays tooltip
+ * @fires mouseleave - Triggered when leaving a label, hides tooltip
+ *
+ * @description
+ * The Spinner component creates a circular wheel divided into equal wedges, each with:
+ * - A distinct color from a 30-color vibrant palette
+ * - An optional curved text label positioned along the wedge arc
+ * - Interactive tooltip on hover
+ * - Responsive font sizing based on label length and slice count
+ *
+ * The component uses SVG for text path rendering to achieve curved labels along the wheel perimeter.
+ * A central pin and optional label tooltip complete the interaction experience.
+ */
+import { COLOR_PALETTE } from "../../pages/data/Spinner/constants.js";
 export default class Spinner extends HTMLElement {
   static observedAttributes = ["slicecount", "labels"];
 

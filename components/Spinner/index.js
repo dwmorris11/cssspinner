@@ -1,2 +1,3 @@
 import Spinner from "./Spinner.js";
-export { Spinner };
+import PreloadOptions from "./PreloadOptions.js";
+export { Spinner, PreloadOptions };

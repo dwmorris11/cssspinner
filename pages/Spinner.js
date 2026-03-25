@@ -1,9 +1,13 @@
 import Page from "./Page.js";
 // import custom components so they are available
-import "../components/Spinner/index.js";
+import { PreloadOptions, Spinner } from "../components/Spinner/index.js";
+import { CUISINES } from "./data/Spinner/constants.js";
 
 export default class SpinnerPage extends Page {
   #children = () => `
+    ${PreloadOptions({
+      selects: [{ id: "cuisines", label: "Cuisines", options: CUISINES }],
+    })}
     <form id="ui-form">
       <textarea
         id="wedges_input"
@@ -103,6 +107,30 @@ export default class SpinnerPage extends Page {
     });
 
     super.appendChild(content);
+
+    // Wire up preload Add buttons (must be after appendChild)
+    this.querySelectorAll(".preload-add-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const selectId = btn.dataset.select;
+        const comboSelect = this.querySelector(`#${selectId}`);
+        if (!comboSelect) return;
+        const values = comboSelect.values || [];
+        if (values.length === 0) return;
+
+        // Append values to textarea
+        const textareaEl = this.querySelector("#wedges_input");
+        textareaEl.value = values.join("\n");
+
+        // Clear combo select selections
+        comboSelect.selected = [];
+        comboSelect.shadowRoot
+          .querySelectorAll(".tag")
+          .forEach((t) => t.remove());
+
+        // Trigger input event to update spinner
+        textareaEl.dispatchEvent(new Event("input"));
+      });
+    });
   }
 }
 
