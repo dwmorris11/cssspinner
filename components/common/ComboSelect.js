@@ -9,19 +9,20 @@ export default class ComboSelect extends HTMLElement {
           --combo-width: 260px;
           --combo-max-height: 180px;
           --combo-font: system-ui, sans-serif;
-          --combo-bg: white;
-          --combo-border: #ccc;
+          --combo-bg: rgba(10, 22, 40, 0.95);
+          --combo-border: #1e3a5f;
           --combo-radius: 6px;
           --combo-padding: 8px;
-          --combo-hover-bg: #eee;
-          --combo-active-bg: #d0e7ff;
-          --combo-selected-bg: #e0f0ff;
-          --combo-tag-bg: #e0f0ff;
-          --combo-tag-color: #004a80;
-          --combo-tag-remove-bg: #c00;
+          --combo-hover-bg: rgba(255, 140, 0, 0.15);
+          --combo-active-bg: rgba(255, 140, 0, 0.25);
+          --combo-selected-bg: rgba(255, 140, 0, 0.2);
+          --combo-tag-bg: rgba(255, 140, 0, 0.2);
+          --combo-tag-color: #ff8c00;
+          --combo-tag-remove-bg: #cc3300;
           --combo-tag-remove-color: white;
-          --combo-header-bg: #f5f5f5;
-          --combo-header-color: #555;
+          --combo-header-bg: rgba(30, 58, 95, 0.8);
+          --combo-header-color: #6b8aad;
+          --combo-text-color: #e8e8e8;
 
           position: relative;
           display: inline-block;
@@ -33,6 +34,19 @@ export default class ComboSelect extends HTMLElement {
           margin-bottom: 4px;
           font-size: 0.875rem;
           font-weight: 500;
+          color: #ff8c00;
+        }
+
+        input {
+          background: transparent;
+          border: none;
+          outline: none;
+          color: var(--combo-text-color);
+          min-width: 60px;
+          flex: 1;
+        }
+
+        input::placeholder {
           color: var(--combo-header-color);
         }
 
@@ -56,7 +70,8 @@ export default class ComboSelect extends HTMLElement {
         .arrow {
           margin-left: auto;
           font-size: 0.7rem;
-          opacity: 0.6;
+          opacity: 0.8;
+          color: #00bfff;
           transition: transform 0.15s ease;
           pointer-events: none;
         }
@@ -76,7 +91,7 @@ export default class ComboSelect extends HTMLElement {
         }
 
         .summary {
-          color: var(--combo-tag-color);
+          color: #00bfff;
           font-size: 0.875rem;
           font-weight: 500;
           padding: 4px 8px;
@@ -137,6 +152,7 @@ export default class ComboSelect extends HTMLElement {
         .item {
           padding: var(--combo-padding);
           cursor: pointer;
+          color: var(--combo-text-color);
         }
 
         .item:hover {
@@ -209,11 +225,13 @@ export default class ComboSelect extends HTMLElement {
         .mode-label {
           padding: 2px;
           opacity: 0.5;
+          color: #6b8aad;
         }
 
         .mode-label.active {
           opacity: 1;
           font-weight: bold;
+          color: #00bfff;
         }
       </style>
 
@@ -240,6 +258,12 @@ export default class ComboSelect extends HTMLElement {
 
     this.input = document.createElement("input");
     this.input.setAttribute("part", "input");
+    this.input.setAttribute("role", "combobox");
+    this.input.setAttribute("aria-autocomplete", "list");
+    this.input.setAttribute("aria-expanded", "false");
+    this.input.setAttribute("aria-haspopup", "listbox");
+    this.input.setAttribute("placeholder", "Type to filter...");
+    this.list.setAttribute("role", "listbox");
     this.wrapper.insertBefore(this.input, this.summaryEl);
 
     this.switch = this.shadowRoot.querySelector(".mode-switch");
@@ -532,11 +556,13 @@ export default class ComboSelect extends HTMLElement {
   openList() {
     this.list.classList.add("open");
     this.arrow.classList.add("open");
+    this.input.setAttribute("aria-expanded", "true");
   }
 
   closeList() {
     this.list.classList.remove("open");
     this.arrow.classList.remove("open");
+    this.input.setAttribute("aria-expanded", "false");
   }
 
   render(items) {
@@ -552,6 +578,8 @@ export default class ComboSelect extends HTMLElement {
     selectAll.textContent = allSelected ? "✓ All selected" : "Select all";
     selectAll.className = allSelected ? "item select-all selected" : "item select-all";
     selectAll.setAttribute("part", "item select-all");
+    selectAll.setAttribute("role", "option");
+    selectAll.setAttribute("aria-selected", allSelected);
     selectAll.addEventListener("click", () => this.toggleSelectAll());
     this.list.appendChild(selectAll);
 
@@ -568,6 +596,8 @@ export default class ComboSelect extends HTMLElement {
             ? "item selected"
             : "item";
           groupItem.setAttribute("part", "item group-item");
+          groupItem.setAttribute("role", "option");
+          groupItem.setAttribute("aria-selected", this.selected.includes(currentGroup));
 
           const groupName = currentGroup; // capture value for closure
           groupItem.addEventListener("click", () => {
@@ -595,6 +625,8 @@ export default class ComboSelect extends HTMLElement {
       div.textContent = o.label;
       div.className = this.selected.includes(o.label) ? "item selected" : "item";
       div.setAttribute("part", "item");
+      div.setAttribute("role", "option");
+      div.setAttribute("aria-selected", this.selected.includes(o.label));
 
       div.addEventListener("click", () => {
         this.toggleTag(o.label);

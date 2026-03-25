@@ -8,23 +8,27 @@ export default class SpinnerPage extends Page {
     ${PreloadOptions({
       selects: [{ id: "cuisines", label: "Cuisines", options: CUISINES }],
     })}
-    <form id="ui-form">
+    <form id="ui-form" aria-label="Spinning wheel configuration">
+      <label for="wedges_input" class="visually-hidden">Wheel options (comma or line separated)</label>
       <textarea
         id="wedges_input"
         class="ui-input"
         placeholder="Enter names (comma or line separated)"
         rows="4"
+        aria-describedby="input-hint"
       ></textarea>
-      <button class="ui-button" type="submit">
+      <span id="input-hint" class="visually-hidden">Enter at least 2 options to spin the wheel</span>
+      <button class="ui-button" type="submit" aria-label="Spin the wheel">
         <span>Spin</span>
       </button>
     </form>
-    <div class="spinning-wheel">
-      <div class="indicator-wrapper">
+    <div class="spinning-wheel" role="img" aria-label="Spinning wheel">
+      <div class="indicator-wrapper" aria-hidden="true">
         <div class="indicator"></div>
       </div>
       <spinner-element slicecount="8" labelmode="radial"></spinner-element>
     </div>
+    <div id="spin-result" role="status" aria-live="polite" class="visually-hidden"></div>
   `;
   constructor() {
     super("spinnerPage");
@@ -100,6 +104,21 @@ export default class SpinnerPage extends Page {
         `${Math.random() * 360}deg`,
       );
       spinner.classList.add("spinning");
+
+      // Announce result after spin animation (3s, or 0.5s with reduced motion)
+      const duration = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 500 : 3000;
+      setTimeout(() => {
+        const finalRotation = parseFloat(spinner.style.getPropertyValue("--final-rotation"));
+        const sliceAngle = 360 / labels.length;
+        // Calculate which slice the indicator points to (top = 0 degrees)
+        const normalizedAngle = (360 - (finalRotation % 360)) % 360;
+        const winningIndex = Math.floor(normalizedAngle / sliceAngle);
+        const winner = labels[winningIndex];
+        const resultEl = this.querySelector("#spin-result");
+        if (resultEl && winner) {
+          resultEl.textContent = `The wheel landed on: ${winner}`;
+        }
+      }, duration);
 
       if (textarea) {
         document.cookie = `savedText=${encodeURIComponent(textarea.value)}; path=/; max-age=${30 * 24 * 60 * 60}`;
