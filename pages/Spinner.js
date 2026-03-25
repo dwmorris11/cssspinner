@@ -38,6 +38,7 @@ export default class SpinnerPage extends Page {
         <li>CSS keyframe animations with cubic-bezier easing</li>
         <li>SVG text paths for curved/radial labels</li>
         <li>Web Components (Custom Elements)</li>
+        <li>Custom resusable ComboFilterSelect that allows selecting groups or details</li>
         <li>Responsive design with CSS custom properties</li>
         <li>Accessibility: reduced motion support, ARIA labels</li>
       </ul>

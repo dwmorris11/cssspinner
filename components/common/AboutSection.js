@@ -74,10 +74,18 @@ export default class AboutSection extends HTMLElement {
           font-size: 0.9rem;
           line-height: 1.6;
           border-top: 1px solid #1e3a5f;
+          max-height: 500px;
+          opacity: 1;
+          overflow: hidden;
+          transition: max-height 0.4s ease-out, opacity 0.3s ease-out, padding 0.4s ease-out;
         }
 
         .content.hidden {
-          display: none;
+          max-height: 0;
+          opacity: 0;
+          padding-top: 0;
+          padding-bottom: 0;
+          border-top: none;
         }
 
         ::slotted(h3) {
