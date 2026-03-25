@@ -73,7 +73,8 @@ export default class ComboSelect extends HTMLElement {
           opacity: 0.8;
           color: #00bfff;
           transition: transform 0.15s ease;
-          pointer-events: none;
+          cursor: pointer;
+          padding: 4px;
         }
 
         .arrow.open {
@@ -324,6 +325,15 @@ export default class ComboSelect extends HTMLElement {
     this.input.addEventListener("input", () => this.filter());
     this.input.addEventListener("focus", () => this.showAll());
     this.input.addEventListener("keydown", (e) => this.handleKey(e));
+
+    this.arrow.addEventListener("click", () => {
+      if (this.list.classList.contains("open")) {
+        this.closeList();
+      } else {
+        this.showAll();
+        this.input.focus();
+      }
+    });
 
     this.switch.addEventListener("click", () => {
       this.mode = this.mode === "simple" ? "detailed" : "simple";
