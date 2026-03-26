@@ -342,6 +342,7 @@
       overflow: visible;
       filter: drop-shadow(0 0 30px rgba(255, 140, 0, 0.3))
         drop-shadow(0 8px 32px rgba(0, 0, 0, 0.5));
+      pointer-events: none;
     }
 
     .spinner.spinning {

@@ -1,3 +1,39 @@
+/**
+ * ComboSelect - A Web Component for multiselect dropdowns
+ *
+ * A custom HTML element that renders a label above a dropdown selector. The dropdown selector
+ * is multiselect and allows selecting all. A unique feature is a simple/detailed mode which
+ * allows selecting by groups or individual items. The component uses shadow DOM for encapsulation
+ * and is highly customizable via CSS variables.
+ *
+ * @class ComboSelect
+ * @extends HTMLElement
+ *
+ * @example
+ * // Basic usage with label and options
+ * <combo-select
+ *   label="Select items"
+ *   options='[{"group":"Asian","items":["Thai","Japanese"]},{"group":"Latin","items":["Mexican"]}]'>
+ * </combo-select>
+ *
+ * @attribute {string} label - Display label above the selector
+ * @attribute {string} options - JSON array of options (flat array of strings or grouped objects)
+ * @attribute {string} simple-label - Label for simple mode toggle (default: "S")
+ * @attribute {string} detailed-label - Label for detailed mode toggle (default: "D")
+ *
+ * @fires change - Triggered when selection changes, detail contains array of selected values
+ *
+ * @description
+ * ComboSelect provides a feature-rich multiselect dropdown with:
+ * - Type-ahead search filtering
+ * - Keyboard navigation (ArrowUp, ArrowDown, Enter, Escape)
+ * - Select all / deselect all functionality
+ * - Simple mode (group-based selection) and detailed mode (item-based selection)
+ * - Tag-style selected items display
+ * - "All selected" summary badge
+ * - Fully accessible with ARIA attributes
+ * - Customizable styling via CSS variables (--combo-*)
+ */
 export default class ComboSelect extends HTMLElement {
   constructor() {
     super();
@@ -500,10 +536,15 @@ export default class ComboSelect extends HTMLElement {
       const groups = [
         ...new Set(this.options.map((o) => o.group).filter(Boolean)),
       ];
-      return groups.length > 0 && groups.every((g) => this.selected.includes(g));
+      return (
+        groups.length > 0 && groups.every((g) => this.selected.includes(g))
+      );
     } else {
       const allLabels = this.options.map((o) => o.label);
-      return allLabels.length > 0 && allLabels.every((l) => this.selected.includes(l));
+      return (
+        allLabels.length > 0 &&
+        allLabels.every((l) => this.selected.includes(l))
+      );
     }
   }
 
@@ -586,7 +627,9 @@ export default class ComboSelect extends HTMLElement {
     const selectAll = document.createElement("div");
     const allSelected = this.isAllSelected();
     selectAll.textContent = allSelected ? "✓ All selected" : "Select all";
-    selectAll.className = allSelected ? "item select-all selected" : "item select-all";
+    selectAll.className = allSelected
+      ? "item select-all selected"
+      : "item select-all";
     selectAll.setAttribute("part", "item select-all");
     selectAll.setAttribute("role", "option");
     selectAll.setAttribute("aria-selected", allSelected);
@@ -607,7 +650,10 @@ export default class ComboSelect extends HTMLElement {
             : "item";
           groupItem.setAttribute("part", "item group-item");
           groupItem.setAttribute("role", "option");
-          groupItem.setAttribute("aria-selected", this.selected.includes(currentGroup));
+          groupItem.setAttribute(
+            "aria-selected",
+            this.selected.includes(currentGroup),
+          );
 
           const groupName = currentGroup; // capture value for closure
           groupItem.addEventListener("click", () => {
@@ -633,7 +679,9 @@ export default class ComboSelect extends HTMLElement {
 
       const div = document.createElement("div");
       div.textContent = o.label;
-      div.className = this.selected.includes(o.label) ? "item selected" : "item";
+      div.className = this.selected.includes(o.label)
+        ? "item selected"
+        : "item";
       div.setAttribute("part", "item");
       div.setAttribute("role", "option");
       div.setAttribute("aria-selected", this.selected.includes(o.label));
